@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Resources:
+
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      CacheClusterEnabled: false
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        Authorizers: 
+          MyLambdaRequestAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn: !GetAtt MyAuthFunction.Arn
+            Identity:
+              Headers:
+                - token
+              ReauthorizeEvery: 0 
+    
+  HelloFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: handler.hello
+      Runtime: nodejs16.x
+      CodeUri: ./hello
+      Events:
+        HelloAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /hello
+            Method: GET
+  HealthCheckFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: handler.healthcheck
+      Runtime: nodejs16.x
+      CodeUri: ./healthcheck
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /healthcheck
+            Method: GET
+  TestFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: handler.test
+      Runtime: nodejs16.x
+      CodeUri: ./test
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /test
+            Method: GET
+  DemoFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: handler.demo
+      Runtime: nodejs16.x
+      CodeUri: ./demo
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /demo
+            Method: GET
+  WorkFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: handler.work
+      Runtime: nodejs16.x
+      CodeUri: ./work
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /work
+            Method: GET
+  
+  MyAuthFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: ./authorizer
+      Handler: handler.authorizer
+      Runtime: nodejs16.x
+  
+Outputs:
+  Region:
+    Description: "Region"
+    Value: !Ref AWS::Region
+
+  ApiId:
+    Description: "API ID"
+    Value: !Ref MyApi
+
+  ApiUrl:
+    Description: "API endpoint URL for Prod environment"
+    Value: !Sub 'https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev/'
