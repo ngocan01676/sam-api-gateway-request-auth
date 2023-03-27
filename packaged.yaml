@@ -99,6 +99,8 @@ Resources:
               Ref: MyApi
             Path: /work
             Method: GET
+            Auth:
+              Authorizer: NONE
     Metadata:
       SamResourceId: WorkFunction
   UploadFileFunction:
@@ -134,7 +136,7 @@ Resources:
   MyAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: s3://learning-serverless-publish-sam-app/3c5971923685c61133078da49518fceb
+      CodeUri: s3://learning-serverless-publish-sam-app/9a6f1f4bcd4a624d0069c916434da594
       Handler: handler.authorizer
       Runtime: nodejs16.x
     Metadata:

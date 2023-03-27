@@ -84,6 +84,8 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /work
             Method: GET
+            Auth:
+              Authorizer: NONE
   UploadFileFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
