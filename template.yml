@@ -84,7 +84,32 @@ Resources:
             RestApiId: !Ref MyApi
             Path: /work
             Method: GET
-  
+  UploadFileFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      CodeUri: ./uploadfile
+      Events:
+        DocsFileUpload:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /docs/file-upload
+            Method: POST
+        DocsFileUploadSimple:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /docs/file-upload-simple
+            Method: POST
+        DocsCreate:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            RestApiId: !Ref MyApi
+            Path: /docs/create
+            Method: POST
+
   MyAuthFunction:
     Type: 'AWS::Serverless::Function'
     Properties:

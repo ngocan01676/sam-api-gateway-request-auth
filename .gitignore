@@ -1,2 +1,7 @@
-packaged.yaml
-.aws-sam/
+!*.*
+.env
+.aws-sam
+# generate_zoom_token/generate_zoom_token
+*.zip
+node_modules/
+.vscode/

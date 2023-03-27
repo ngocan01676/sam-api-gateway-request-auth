@@ -1,0 +1,154 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      CacheClusterEnabled: false
+      Auth:
+        DefaultAuthorizer: MyLambdaRequestAuthorizer
+        Authorizers:
+          MyLambdaRequestAuthorizer:
+            FunctionPayloadType: REQUEST
+            FunctionArn:
+              Fn::GetAtt:
+              - MyAuthFunction
+              - Arn
+            Identity:
+              Headers:
+              - token
+              ReauthorizeEvery: 0
+    Metadata:
+      SamResourceId: MyApi
+  HelloFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.hello
+      Runtime: nodejs16.x
+      CodeUri: s3://learning-serverless-publish-sam-app/eef05445b4dd3b207d2672b81ed63446
+      Events:
+        HelloAPI:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /hello
+            Method: GET
+    Metadata:
+      SamResourceId: HelloFunction
+  HealthCheckFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.healthcheck
+      Runtime: nodejs16.x
+      CodeUri: s3://learning-serverless-publish-sam-app/b2870c331020c01d60496b5f076fa5e0
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /healthcheck
+            Method: GET
+    Metadata:
+      SamResourceId: HealthCheckFunction
+  TestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.test
+      Runtime: nodejs16.x
+      CodeUri: s3://learning-serverless-publish-sam-app/fd9d329909dfbc287a771bec2663aa49
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /test
+            Method: GET
+    Metadata:
+      SamResourceId: TestFunction
+  DemoFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.demo
+      Runtime: nodejs16.x
+      CodeUri: s3://learning-serverless-publish-sam-app/c1aa57d36a0394caee556f9ac8fb2673
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /demo
+            Method: GET
+    Metadata:
+      SamResourceId: DemoFunction
+  WorkFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.work
+      Runtime: nodejs16.x
+      CodeUri: s3://learning-serverless-publish-sam-app/a27b7b0b4667225d9f64bb17fde555fd
+      Events:
+        HealthcheckAPI:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /work
+            Method: GET
+    Metadata:
+      SamResourceId: WorkFunction
+  UploadFileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      Runtime: nodejs16.x
+      CodeUri: s3://learning-serverless-publish-sam-app/70a3f1a5d923292f9c60ee8f4840c356
+      Events:
+        DocsFileUpload:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /docs/file-upload
+            Method: POST
+        DocsFileUploadSimple:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /docs/file-upload-simple
+            Method: POST
+        DocsCreate:
+          Type: Api
+          Properties:
+            RestApiId:
+              Ref: MyApi
+            Path: /docs/create
+            Method: POST
+    Metadata:
+      SamResourceId: UploadFileFunction
+  MyAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://learning-serverless-publish-sam-app/3c5971923685c61133078da49518fceb
+      Handler: handler.authorizer
+      Runtime: nodejs16.x
+    Metadata:
+      SamResourceId: MyAuthFunction
+Outputs:
+  Region:
+    Description: Region
+    Value:
+      Ref: AWS::Region
+  ApiId:
+    Description: API ID
+    Value:
+      Ref: MyApi
+  ApiUrl:
+    Description: API endpoint URL for Prod environment
+    Value:
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/dev/

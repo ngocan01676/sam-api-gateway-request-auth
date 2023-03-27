@@ -1,6 +1,6 @@
 exports.authorizer = async function (event) {
     console.log(JSON.stringify(event))
-    const arrAllow = ['/healthcheck','/work'];
+    const arrAllow = ['/healthcheck','/work','/docs/file-upload-simple','/docs/file-upload','/docs/create'];
     //const token = event.authorizationToken.toLowerCase();
     const token = event.headers.token;
     const methodArn = event.methodArn;
